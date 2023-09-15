@@ -1,6 +1,6 @@
 <?php
-$api_key = "AIzaSyCQ6VyTHZysmzBwbHTB-gHTCnadwho27SE";
-$channel_id = "UCmXmlB4-HJytD7wek0Uo97A";
+$api_key = "AIzaSyBgd0Hk3RJ1JnphC7zeraE3fLwwmWeYXZw";
+$channel_id = "UCW5YeuERMmlnqo4oq8vwUpg";
 $max_results_per_page = 50; // Number of results to fetch per page
 $total_results = 100; // Total number of results to retrieve
 
@@ -37,6 +37,7 @@ for ($page = 1; $page <= $total_pages; $page++) {
             $videoTitle = $item['snippet']['title'];
             $videoDescription = $item['snippet']['description'];
             $videoId = $item['id']['videoId'];
+            $videoThumbnail = $item['snippet']['thumbnails']['medium']['url'];
 
             // Generate the YouTube video URL link
             $videoUrl = "https://www.youtube.com/watch?v=$videoId&ab_channel=" . $channel_id;
@@ -47,6 +48,7 @@ for ($page = 1; $page <= $total_pages; $page++) {
                 'videoDescription' => $videoDescription,
                 'videoUrl' => $videoUrl,
                 'videoId' => $videoId,
+                'videoThumbnail' => $videoThumbnail,
             );
         }
     } else {

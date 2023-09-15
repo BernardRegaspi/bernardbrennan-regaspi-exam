@@ -13,6 +13,7 @@ echo $video["videoTitle"]; // "Build a Microservice with Go #4 - Data Model"
 echo $video["videoDescription"]; // Video description
 echo $video["videoUrl"]; // Video URL
 echo $video["videoId"]; // Video ID
+echo $video["videoThumbnail"]; // Video Thumbnail
 
 // print_r($channel_data);
 
@@ -53,7 +54,6 @@ if ($stmt->execute()) {
 // Close the statement
 $stmt->close();
 
-
 $videos = $channel_data["videos"];
 
 foreach ($videos as $video) {
@@ -61,16 +61,17 @@ foreach ($videos as $video) {
     $videoUrl = $video['videoUrl'];
     $videoDescription = $video['videoDescription'];
     $videoId = $video['videoId'];
+    $videoThumbnail = $video['videoThumbnail']; // Add Video Thumbnail
 
     // Prepare the SQL statement
-    $sql = "INSERT INTO youtube_channel_videos (id_channel, video_id, video_title, video_url, video_description)
-            VALUES ((SELECT id_channel FROM youtube_channels WHERE channel_name = ?), ?, ?, ?, ?)";
+    $sql = "INSERT INTO youtube_channel_videos (id_channel, video_id, video_title, video_url, video_description, video_thumbnail)
+            VALUES ((SELECT id_channel FROM youtube_channels WHERE channel_name = ?), ?, ?, ?, ?, ?)";
 
     // Create a prepared statement
     $stmt = $conn->prepare($sql);
 
     // Bind parameters
-    $stmt->bind_param("sssss", $channelName, $videoId, $videoTitle, $videoUrl, $videoDescription);
+    $stmt->bind_param("ssssss", $channelName, $videoId, $videoTitle, $videoUrl, $videoDescription, $videoThumbnail);
 
     // Execute the statement
     if ($stmt->execute()) {
