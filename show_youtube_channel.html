@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>YouTube Channel Viewer</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
+      crossorigin="anonymous"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+  </head>
+  <body>
+    <div id="app" class="container bg-light-gray">
+      <div class="d-flex align-items-center mb-5">
+        <div class="p-2">
+          <img
+            :src="channelProfilePicture"
+            alt="Channel Profile Picture"
+            width="240"
+          />
+        </div>
+        <div class="p-2">
+          <h1>{{ channelName }}</h1>
+          <p><span class="fw-bold">Channel Description:</span> <br />{{ channelDescription }}</p>
+        </div>
+      </div>
+
+      <div v-if="videos.length > 0">
+        <div class="row">
+          <div
+            class="col-4 mb-4"
+            v-for="(video, index) in videos"
+            :key="video.videoTitle"
+          >
+            <div class="card">
+              <iframe
+                :src="'https://www.youtube.com/embed/' + video.videoId"
+                height="280"
+              ></iframe>
+              {{index + 1}}
+              
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // Define a global callback function for JSONP data
+      function handleData(data) {
+        app.handleData(data);
+      }
+
+      const app = new Vue({
+        el: "#app",
+        data: {
+          channelName: "",
+          channelDescription: "",
+          channelProfile: "",
+          channelProfilePicture: "",
+          videos: [],
+          page: 1,
+          perPage: 20,
+        },
+        computed: {},
+        methods: {
+          fetchData() {
+            const script = document.createElement("script");
+            script.src =
+              "http://localhost/youtube/youtube_channel_json.php?callback=handleData";
+            document.body.appendChild(script);
+          },
+          handleData(data) {
+            this.channelName = data.channelName;
+            this.channelDescription = data.channelDescription;
+            this.channelProfile = data.channelProfile;
+            this.channelProfilePicture = data.channelProfilePicture;
+            this.videos = data.videos;
+            console.log(data);
+          },
+        },
+        mounted() {
+          this.fetchData();
+        },
+      });
+    </script>
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+      crossorigin="anonymous"
+    ></script>
+  </body>
+</html>
