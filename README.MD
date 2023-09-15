@@ -1,1 +1,1 @@
-Exam by [Bernard Brennan Regaspi], [September 14 - 16], [10:00 am], [10:00 am]
+Exam by [Bernard Brennan Regaspi], [September 14 - 15], [10:00 am], [10:00 pm]
