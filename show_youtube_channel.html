@@ -8,29 +8,51 @@
       integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN"
       crossorigin="anonymous"
     />
+    <style>
+      .loading-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(255, 255, 255, 0.7);
+        z-index: 9999; 
+      }
+
+    </style>
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
   </head>
   <body>
-    <div id="app" class="container bg-light-gray">
-      <div class="d-flex align-items-center mb-5">
-        <div class="p-2">
-          <img
-            :src="channelProfilePicture"
-            alt="Channel Profile Picture"
-            width="240"
-          />
-        </div>
-        <div class="p-2">
-          <h1>{{ channelName }}</h1>
-          <p><span class="fw-bold">Channel Description:</span> <br />{{ channelDescription }}</p>
-        </div>
+    <div id="app" class="container">
+      <div v-if="isLoading" class="loading-container">
+        <h5>Loading...</h5>
       </div>
+      <div v-else>
+        <div class="d-flex align-items-center mb-5">
+          <div class="p-2">
+            <img
+              :src="channelProfilePicture"
+              alt="Channel Profile Picture"
+              width="240"
+            />
+          </div>
+          <div class="p-2">
+            <h1>{{ channelName }}</h1>
+            <p>
+              <span class="fw-bold">Channel Description:</span> <br />{{
+                channelDescription
+              }}
+            </p>
+          </div>
+        </div>
 
-      <div v-if="videos.length > 0">
         <div class="row">
           <div
             class="col-4 mb-4"
-            v-for="(video, index) in videos"
+            v-for="(video, index) in paginatedVideos"
             :key="video.videoTitle"
           >
             <div class="card">
@@ -38,12 +60,41 @@
                 :src="'https://www.youtube.com/embed/' + video.videoId"
                 height="280"
               ></iframe>
-              {{index + 1}}
-              
-
+              {{ index + 1 }}
             </div>
           </div>
         </div>
+        <nav aria-label="Page navigation example">
+          <ul class="pagination justify-content-center">
+            <li class="page-item" :class="{ disabled: currentPage === 1 }">
+              <a class="page-link" @click="prevPage" style="cursor: pointer;">
+                Previous
+              </a>
+            </li>
+            <li
+              class="page-item"
+              v-for="page in totalPages"
+              :key="page"
+            >
+              <a
+                class="page-link"
+                @click="changePage(page)"
+                style="cursor: pointer;"
+                :class="{ 'bg-primary text-white': page === currentPage }"
+              >
+                {{ page }}
+              </a>
+            </li>
+            <li
+              class="page-item"
+              :class="{ disabled: currentPage === totalPages }"
+            >
+              <a class="page-link" @click="nextPage" style="cursor: pointer;">
+                Next
+              </a>
+            </li>
+          </ul>
+        </nav>
       </div>
     </div>
 
@@ -61,15 +112,28 @@
           channelProfile: "",
           channelProfilePicture: "",
           videos: [],
-          page: 1,
+          currentPage: 1,
           perPage: 20,
+          isLoading: true,
         },
-        computed: {},
+        computed: {
+          paginatedVideos() {
+            const startIndex = (this.currentPage - 1) * this.perPage;
+            const endIndex = startIndex + this.perPage;
+            return this.videos.slice(startIndex, endIndex);
+          },
+          totalPages() {
+            return Math.ceil(this.videos.length / this.perPage);
+          },
+        },
         methods: {
           fetchData() {
             const script = document.createElement("script");
             script.src =
               "http://localhost/youtube/youtube_channel_json.php?callback=handleData";
+            script.onload = () => {
+              this.isLoading = false;
+            };
             document.body.appendChild(script);
           },
           handleData(data) {
@@ -78,7 +142,19 @@
             this.channelProfile = data.channelProfile;
             this.channelProfilePicture = data.channelProfilePicture;
             this.videos = data.videos;
-            console.log(data);
+          },
+          changePage(page) {
+            this.currentPage = page;
+          },
+          prevPage() {
+            if (this.currentPage > 1) {
+              this.currentPage--;
+            }
+          },
+          nextPage() {
+            if (this.currentPage < this.totalPages) {
+              this.currentPage++;
+            }
           },
         },
         mounted() {
